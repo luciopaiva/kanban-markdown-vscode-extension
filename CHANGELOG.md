@@ -5,6 +5,44 @@ All notable changes to the Kanban Markdown extension will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.10.0] - 2026-02-24
+
+### Added
+- Configurable filename pattern setting with migration support ([#34](https://github.com/LachyFS/kanban-markdown-vscode-extension/issues/34))
+- Setting to insert new cards at the top of a column ([#32](https://github.com/LachyFS/kanban-markdown-vscode-extension/issues/32))
+- Column context menu with move all cards action ([#30](https://github.com/LachyFS/kanban-markdown-vscode-extension/issues/30))
+
+### Changed
+- Feature file paths are now relative to workspace root in KanbanPanel
+- Removed unused featureId display in FeatureEditor component
+
+### Fixed
+- Duplicate title names handling
+- Removed redundant configuration retrieval in KanbanPanel
+
+### Thanks
+- [@luciopaiva](https://github.com/luciopaiva) for contributing configurable filename patterns ([#34](https://github.com/LachyFS/kanban-markdown-vscode-extension/pull/34)), insert new cards at top ([#32](https://github.com/LachyFS/kanban-markdown-vscode-extension/pull/32)), and move all cards action ([#30](https://github.com/LachyFS/kanban-markdown-vscode-extension/pull/30))
+
+## [1.9.1] - 2026-02-21
+
+### Fixed
+- Prevent submission of empty feature title and description in CreateFeatureDialog
+
+## [1.9.0] - 2026-02-21
+
+### Added
+- Column collapse functionality in Kanban board
+
+## [1.8.1] - 2026-02-20
+
+### Fixed
+- Removed unnecessary compact mode check for feature labels in FeatureCard component
+
+## [1.8.0] - 2026-02-20
+
+### Added
+- Fractional indexing for order metadata
+
 ## [1.7.0] - 2026-02-20
 
 ### Added
