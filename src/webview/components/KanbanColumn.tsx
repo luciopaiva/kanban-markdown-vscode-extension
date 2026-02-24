@@ -2,12 +2,13 @@ import { Plus, ChevronLeft, MoreVertical, ChevronRight } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import { FeatureCard } from './FeatureCard'
 import type { Feature, KanbanColumn as KanbanColumnType } from '../../shared/types'
-import { useStore, type LayoutMode } from '../store'
+import type { LayoutMode } from '../store'
 import type { DropTarget } from './KanbanBoard'
 
 interface KanbanColumnProps {
   column: KanbanColumnType
   features: Feature[]
+  otherColumns: KanbanColumnType[]
   onFeatureClick: (feature: Feature) => void
   onAddFeature: (status: string) => void
   onCollapse: () => void
@@ -25,6 +26,7 @@ interface KanbanColumnProps {
 export function KanbanColumn({
   column,
   features,
+  otherColumns,
   onFeatureClick,
   onAddFeature,
   onCollapse,
@@ -40,8 +42,6 @@ export function KanbanColumn({
 }: KanbanColumnProps) {
   const isVertical = layout === 'vertical'
   const isDropTarget = dropTarget && dropTarget.columnId === column.id
-  const columns = useStore((s) => s.columns)
-  const otherColumns = columns.filter((c) => c.id !== column.id)
   const [menuOpen, setMenuOpen] = useState(false)
   const [submenuOpen, setSubmenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)

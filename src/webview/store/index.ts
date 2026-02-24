@@ -97,7 +97,6 @@ export const useStore = create<KanbanState>((set, get) => ({
     showBuildWithAI: true,
     showFileName: false,
     compactMode: false,
-    addNewCardsToTop: false,
     markdownEditorMode: false,
     defaultPriority: 'medium',
     defaultStatus: 'backlog'

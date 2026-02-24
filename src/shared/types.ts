@@ -80,7 +80,6 @@ export interface CardDisplaySettings {
   markdownEditorMode: boolean
   defaultPriority: Priority
   defaultStatus: FeatureStatus
-  addNewCardsToTop: boolean
 }
 
 // Messages between extension and webview
@@ -116,3 +115,4 @@ export type WebviewMessage =
   | { type: 'openFile'; featureId: string }
   | { type: 'openSettings' }
   | { type: 'toggleColumnCollapsed'; columnId: string }
+  | { type: 'moveAllCards'; sourceColumnId: string; targetColumnId: string }

@@ -160,6 +160,9 @@ export class KanbanPanel {
             await this._context.workspaceState.update('kanban-markdown.collapsedColumns', collapsed)
             break
           }
+          case 'moveAllCards':
+            await this._moveAllCards(message.sourceColumnId, message.targetColumnId)
+            break
           case 'startWithAI':
             await this._startWithAI(message.agent, message.permissionMode)
             break
@@ -643,6 +646,54 @@ export class KanbanPanel {
     this._sendFeaturesToWebview()
   }
 
+  private async _moveAllCards(sourceColumnId: string, targetColumnId: string): Promise<void> {
+    const featuresDir = this._getWorkspaceFeaturesDir()
+    if (!featuresDir) return
+
+    const sourceFeatures = this._features
+      .filter(f => f.status === sourceColumnId)
+      .sort((a, b) => (a.order < b.order ? -1 : a.order > b.order ? 1 : 0))
+    if (sourceFeatures.length === 0) return
+
+    const targetFeatures = this._features
+      .filter(f => f.status === targetColumnId)
+      .sort((a, b) => (a.order < b.order ? -1 : a.order > b.order ? 1 : 0))
+
+    const lastTargetOrder = targetFeatures.length > 0 ? targetFeatures[targetFeatures.length - 1].order : null
+    const newKeys = generateNKeysBetween(lastTargetOrder, null, sourceFeatures.length)
+
+    const oldStatus = sourceColumnId
+    const newStatus = targetColumnId as FeatureStatus
+    const crossingDoneBoundary = oldStatus === 'done' || newStatus === 'done' as string
+
+    this._migrating = crossingDoneBoundary
+    try {
+      for (let i = 0; i < sourceFeatures.length; i++) {
+        const feature = sourceFeatures[i]
+        feature.status = newStatus
+        feature.modified = new Date().toISOString()
+        feature.completedAt = newStatus === 'done' ? new Date().toISOString() : null
+        feature.order = newKeys[i]
+
+        const content = this._serializeFeature(feature)
+        await vscode.workspace.fs.writeFile(vscode.Uri.file(feature.filePath), new TextEncoder().encode(content))
+
+        if (crossingDoneBoundary) {
+          try {
+            const newPath = await moveFeatureFile(feature.filePath, featuresDir, targetColumnId)
+            feature.filePath = newPath
+          } catch {
+            // Will reconcile on next load
+          }
+        }
+      }
+    } finally {
+      this._migrating = false
+    }
+
+    this._sendFeaturesToWebview()
+  }
+
   private async _deleteFeature(featureId: string): Promise<void> {
     const feature = this._features.find(f => f.id === featureId)
     if (!feature) return
@@ -935,8 +986,7 @@ export class KanbanPanel {
       compactMode: config.get<boolean>('compactMode', false),
       markdownEditorMode: config.get<boolean>('markdownEditorMode', false),
       defaultPriority: config.get<Priority>('defaultPriority', 'medium'),
-      defaultStatus: config.get<FeatureStatus>('defaultStatus', 'backlog'),
-      addNewCardsToTop: config.get<boolean>('addNewCardsToTop', false)
+      defaultStatus: config.get<FeatureStatus>('defaultStatus', 'backlog')
     }
 
     const collapsedColumns: string[] = this._context.workspaceState.get('kanban-markdown.collapsedColumns', [])
