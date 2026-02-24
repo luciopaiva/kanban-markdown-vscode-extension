@@ -563,7 +563,6 @@ export class KanbanPanel {
     const pattern = config.get<FilenamePattern>('filenamePattern', 'name-date')
     const filename = generateFeatureFilename(title, pattern)
     const now = new Date().toISOString()
-    const config = vscode.workspace.getConfiguration('kanban-markdown')
     const addNewCardsToTop = config.get<boolean>('addNewCardsToTop', false)
     const featuresInStatus = this._features
       .filter(f => f.status === data.status)
