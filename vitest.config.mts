@@ -13,19 +13,18 @@ export default defineConfig({
     globals: true,
     // Apply jsdom to webview tests, node to everything else
     environmentMatchGlobs: [
-      ['src/webview/**', 'jsdom'],
-      ['src/shared/**', 'node'],
-      ['src/extension/**', 'node']
+      ['tests/webview/**', 'jsdom'],
+      ['tests/shared/**', 'node'],
+      ['tests/extension/**', 'node']
     ],
     // Default environment for any test not matched above
     environment: 'node',
-    setupFiles: ['src/test/setup.ts'],
+    setupFiles: ['tests/setup.ts'],
     include: [
-      'src/**/__tests__/**/*.{test,spec}.{ts,tsx}',
-      'src/**/*.{test,spec}.{ts,tsx}'
+      'tests/**/*.{test,spec}.{ts,tsx}'
     ],
     exclude: [
-      'src/test/integration/**',
+      'tests/integration/**',
       'node_modules/**'
     ],
     coverage: {
