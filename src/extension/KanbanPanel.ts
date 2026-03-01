@@ -2,7 +2,7 @@ import * as vscode from 'vscode'
 import * as path from 'path'
 import { generateKeyBetween, generateNKeysBetween } from 'fractional-indexing'
 import { getTitleFromContent, generateFeatureFilename } from '../shared/types'
-import type { Feature, FeatureStatus, Priority, KanbanColumn, FeatureFrontmatter, CardDisplaySettings, FilenamePattern } from '../shared/types'
+import type { Feature, FeatureStatus, Priority, KanbanColumn, FeatureFrontmatter, CardDisplaySettings, FilenamePattern, AIAgent, AIPermissionMode } from '../shared/types'
 import { ensureStatusSubfolders, moveFeatureFile, getFeatureFilePath, getStatusFromPath, fileExists } from './featureFileUtils'
 
 interface CreateFeatureData {
@@ -165,6 +165,12 @@ export class KanbanPanel {
             break
           case 'archiveAllCards':
             await this._archiveAllCards(message.sourceColumnId)
+            break
+          case 'renameLabel':
+            await this._renameLabel(message.oldName, message.newName)
+            break
+          case 'deleteLabel':
+            await this._deleteLabel(message.labelName)
             break
           case 'startWithAI':
             await this._startWithAI(message.agent, message.permissionMode)
@@ -726,6 +732,8 @@ export class KanbanPanel {
     await vscode.workspace.fs.createDirectory(vscode.Uri.file(archivedDir))
 
     this._migrating = true
+    const archivedIds = new Set<string>()
+    let failedCount = 0
     try {
       for (const feature of sourceFeatures) {
         const filename = path.basename(feature.filePath)
@@ -745,16 +753,19 @@ export class KanbanPanel {
             vscode.Uri.file(feature.filePath),
             vscode.Uri.file(targetPath)
           )
+          archivedIds.add(feature.id)
         } catch {
-          // Skip files that fail to move
+          failedCount++
           continue
         }
-
-        // Remove the feature from the in-memory list
-        this._features = this._features.filter(f => f.id !== feature.id)
       }
+      this._features = this._features.filter(f => !archivedIds.has(f.id))
     } finally {
       this._migrating = false
+    }
+
+    if (failedCount > 0) {
+      vscode.window.showWarningMessage(`${failedCount} card${failedCount === 1 ? '' : 's'} could not be archived.`)
     }
 
     this._sendFeaturesToWebview()
@@ -898,8 +909,8 @@ export class KanbanPanel {
   }
 
   private async _startWithAI(
-    agent?: 'claude' | 'codex' | 'opencode',
-    permissionMode?: 'default' | 'plan' | 'acceptEdits' | 'bypassPermissions'
+    agent?: AIAgent,
+    permissionMode?: AIPermissionMode
   ): Promise<void> {
     // Find the currently editing feature
     const feature = this._features.find(f => f.id === this._currentEditingFeatureId)
@@ -943,6 +954,10 @@ export class KanbanPanel {
         command = `codex --approval-mode ${approvalMode} "${escapedPrompt}"`
         break
       }
+      case 'copilot': {
+        command = `copilot "${escapedPrompt}"`
+        break
+      }
       case 'opencode': {
         command = `opencode "${escapedPrompt}"`
         break
@@ -954,6 +969,7 @@ export class KanbanPanel {
     const agentNames: Record<string, string> = {
       'claude': 'Claude Code',
       'codex': 'Codex',
+      'copilot': 'GitHub Copilot',
       'opencode': 'OpenCode'
     }
     const terminal = vscode.window.createTerminal({
@@ -962,6 +978,64 @@ export class KanbanPanel {
     })
     terminal.show()
     terminal.sendText(command)
+  }
+
+  private async _deleteLabel(labelName: string): Promise<void> {
+    const trimmed = labelName.trim()
+    if (!trimmed) return
+
+    const affectedFeatures = this._features.filter(f => f.labels.includes(trimmed))
+    if (affectedFeatures.length === 0) return
+
+    const count = affectedFeatures.length
+    const confirm = await vscode.window.showWarningMessage(
+      `Remove label "${trimmed}" from ${count} card${count === 1 ? '' : 's'}?`,
+      { modal: true },
+      'Remove'
+    )
+    if (confirm !== 'Remove') return
+
+    for (const feature of affectedFeatures) {
+      const idx = feature.labels.indexOf(trimmed)
+      if (idx !== -1) {
+        feature.labels.splice(idx, 1)
+        feature.modified = new Date().toISOString()
+
+        const content = this._serializeFeature(feature)
+        await vscode.workspace.fs.writeFile(vscode.Uri.file(feature.filePath), new TextEncoder().encode(content))
+      }
+    }
+
+    this._sendFeaturesToWebview()
+  }
+
+  private async _renameLabel(oldName: string, newName: string): Promise<void> {
+    const trimmedOld = oldName.trim()
+    const trimmedNew = newName.trim()
+    if (!trimmedOld || !trimmedNew || trimmedOld === trimmedNew) return
+
+    let updatedCount = 0
+    for (const feature of this._features) {
+      const idx = feature.labels.indexOf(trimmedOld)
+      if (idx === -1) continue
+
+      // Replace old label with new, avoiding duplicates
+      if (feature.labels.includes(trimmedNew)) {
+        // New name already exists on this feature — just remove the old one
+        feature.labels.splice(idx, 1)
+      } else {
+        feature.labels[idx] = trimmedNew
+      }
+      feature.modified = new Date().toISOString()
+
+      const content = this._serializeFeature(feature)
+      await vscode.workspace.fs.writeFile(vscode.Uri.file(feature.filePath), new TextEncoder().encode(content))
+      updatedCount++
+    }
+
+    if (updatedCount > 0) {
+      this._sendFeaturesToWebview()
+    }
   }
 
   private async _promptFilenamePatternMigration(): Promise<void> {

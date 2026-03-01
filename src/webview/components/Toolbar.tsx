@@ -1,6 +1,8 @@
-import { Search, X, Columns, Rows, Settings } from 'lucide-react'
+import { Search, X, Columns, Rows, Settings, Tags } from 'lucide-react'
 import { useStore, type DueDateFilter } from '../store'
 import type { Priority } from '../../shared/types'
+import { useState } from 'react'
+import { LabelManager } from './LabelManager'
 
 const priorities: { value: Priority | 'all'; label: string }[] = [
   { value: 'all', label: 'All Priorities' },
@@ -45,6 +47,8 @@ export function Toolbar({ onOpenSettings }: { onOpenSettings: () => void }) {
   const assignees = getUniqueAssignees()
   const labels = getUniqueLabels()
   const filtersActive = hasActiveFilters()
+
+  const [labelManagerOpen, setLabelManagerOpen] = useState(false)
 
   return (
     <div className="flex items-center gap-2 px-4 py-2 border-b border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/50 flex-wrap">
@@ -103,11 +107,16 @@ export function Toolbar({ onOpenSettings }: { onOpenSettings: () => void }) {
         className={selectClassName}
       >
         <option value="all">All Labels</option>
-        {labels.map((l) => (
-          <option key={l} value={l}>
-            {l}
-          </option>
-        ))}
+        <option value="unlabeled">Unlabeled</option>
+        {labels.length > 0 && (
+          <optgroup label="Labels">
+            {labels.map((l) => (
+              <option key={l} value={`label:${l}`}>
+                {l}
+              </option>
+            ))}
+          </optgroup>
+        )}
       </select>
       )}
 
@@ -146,6 +155,23 @@ export function Toolbar({ onOpenSettings }: { onOpenSettings: () => void }) {
       >
         {layout === 'horizontal' ? <Rows size={16} /> : <Columns size={16} />}
       </button>
+
+
+      {/* Manage Labels */}
+      {cardSettings.showLabels && labels.length > 0 && (
+        <div className="relative">
+          <button
+            onClick={() => setLabelManagerOpen(!labelManagerOpen)}
+            className="flex items-center gap-1 px-2 py-1.5 text-sm text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-md transition-colors"
+            title="Manage labels"
+          >
+            <Tags size={14} />
+          </button>
+          {labelManagerOpen && (
+            <LabelManager onClose={() => setLabelManagerOpen(false)} />
+          )}
+        </div>
+      )}
 
       {/* Settings */}
       <button
