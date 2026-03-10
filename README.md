@@ -1,95 +1,112 @@
+<div align="center">
+
+<img src="https://raw.githubusercontent.com/LachyFS/kanban-markdown-vscode-extension/main/resources/icon.png" alt="Kanban Markdown" width="128" />
+
 # Kanban Markdown
 
-A VSCode/Cursor extension that brings a full-featured kanban board directly into your editor. Features are stored as human-readable markdown files, making them version-controllable and easy to edit outside the board.
+*"Now your backlog can have merge conflicts too."*
+
+**A kanban board inside your editor. Features stored as markdown — version-controllable, human-readable, AI-ready.**
 
 [![VS Marketplace](https://img.shields.io/visual-studio-marketplace/v/LachyFS.kanban-markdown?label=VS%20Marketplace&logo=visualstudiocode)](https://marketplace.visualstudio.com/items?itemName=LachyFS.kanban-markdown)
 [![Open VSX](https://img.shields.io/open-vsx/v/LachyFS/kanban-markdown?label=Open%20VSX&logo=vscodium)](https://open-vsx.org/extension/LachyFS/kanban-markdown)
-![License](https://img.shields.io/badge/license-MIT-green)
+[![Open VSX Downloads](https://img.shields.io/open-vsx/dt/LachyFS/kanban-markdown?label=Downloads&logo=vscodium)](https://open-vsx.org/extension/LachyFS/kanban-markdown)
+[![GitHub Stars](https://img.shields.io/github/stars/LachyFS/kanban-markdown-vscode-extension?style=flat&logo=github)](https://github.com/LachyFS/kanban-markdown-vscode-extension)
+[![CI](https://img.shields.io/github/actions/workflow/status/LachyFS/kanban-markdown-vscode-extension/ci.yml?label=CI&logo=github)](https://github.com/LachyFS/kanban-markdown-vscode-extension/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-![Kanban Board Overview](https://raw.githubusercontent.com/LachyFS/kanban-markdown-vscode-extension/main/docs/images/board-overview.png)
+[![Claude Code](https://img.shields.io/badge/Claude_Code-supported-f97316?logo=anthropic&logoColor=white)](https://docs.anthropic.com/en/docs/claude-code)
+[![Codex](https://img.shields.io/badge/Codex-supported-10a37f?logo=openai&logoColor=white)](https://github.com/openai/codex)
+[![GitHub Copilot](https://img.shields.io/badge/Copilot-supported-2b6cb0?logo=githubcopilot&logoColor=white)](https://github.com/features/copilot)
+[![OpenCode](https://img.shields.io/badge/OpenCode-supported-64748b)](https://github.com/opencode-ai/opencode)
+[![skills.sh](https://img.shields.io/badge/skills.sh-compatible-a855f7)](https://skills.sh)
+
+<img src="https://raw.githubusercontent.com/LachyFS/kanban-markdown-vscode-extension/main/docs/images/editor-view.png" alt="Editor View" width="800" />
+
+</div>
+
+## Quick Start
+
+1. **Install** — search "Kanban Markdown" in the Extensions view ([VS Marketplace](https://marketplace.visualstudio.com/items?itemName=LachyFS.kanban-markdown) / [Open VSX](https://open-vsx.org/extension/LachyFS/kanban-markdown))
+2. **Open** — run `Open Kanban Board` from the command palette (`Cmd+Shift+P` / `Ctrl+Shift+P`)
+3. **Create** — press `N` to add your first feature card
 
 ## Kanban Skill
 
-Install the [kanban-skill](https://github.com/LachyFS/kanban-skill) via [skills.sh](https://skills.sh) to give your AI agent full context of your board and the ability to create, update, and move features directly from the terminal. Works with Claude Code, Codex, OpenCode, and any skills.sh-compatible agent.
+> [!TIP]
+> Give your AI agent read/write access to your board. Create, update, move, and query features straight from the terminal.
+>
+> ```bash
+> npx skills add https://github.com/LachyFS/kanban-skill
+> ```
+>
+> Works with Claude Code, Codex, OpenCode, and any [skills.sh](https://skills.sh)-compatible agent. See [kanban-skill](https://github.com/LachyFS/kanban-skill) for details.
 
-```bash
-npx skills add https://github.com/LachyFS/kanban-skill
-```
+## Why Kanban Markdown?
+
+Your board lives next to your code as plain markdown files. `git diff` them, review them in PRs, edit them in any editor. No accounts, no subscriptions. And because they're just text with YAML frontmatter, AI agents can read and update them without any special tooling.
+
+## Built for AI Agents
+
+Hit "Build with AI" on any card and your agent gets the full context — title, priority, labels, description. Pair it with the [kanban-skill](#kanban-skill) and agents can pick cards off the board, implement them, and move them to Review on their own.
+
+### Supported Agents & Modes
+
+| Agent | Modes | What happens |
+|-------|-------|-------------|
+| **Claude Code** | Default, Plan, Auto-edit, Full Auto | Opens a terminal session with feature context |
+| **Codex** | Suggest, Auto-edit, Full Auto | Sends the feature as a prompt to Codex CLI |
+| **GitHub Copilot** | Default | Opens Copilot chat with feature context |
+| **OpenCode** | Default | Opens an OpenCode session with feature context |
 
 ## Features
 
-### Kanban Board
+### Board & Workflow
 
-- **5-column workflow**: Backlog, To Do, In Progress, Review, Done
-- **Sidebar view**: Access the board from the activity bar without opening a panel
-- **Drag-and-drop**: Move cards between columns and reorder within columns
-- **Split-view editor**: Board on left, inline markdown editor on right
-- **Layout toggle**: Switch between horizontal and vertical board layouts
-- **Keyboard shortcuts**:
-  - `N` - Create new feature
-  - `Esc` - Close dialogs
-  - `Cmd/Ctrl + Enter` - Submit create dialog
-  - `Enter` in title - Move to description field
-  - `Shift + Enter` in title - Add new line
+- **5-column workflow** — Backlog, To Do, In Progress, Review, Done (fully customizable)
+- **Drag-and-drop** — move cards between columns and reorder within columns
+- **Sidebar view** — access the board from the activity bar
+- **Split-view editor** — board on left, inline editor on right
+- **Layout toggle** — horizontal and vertical layouts
+- **Compact mode** — condense cards to fit more on screen
+- **Keyboard shortcuts** — `N` new feature, `Esc` close dialogs, `Cmd/Ctrl+Enter` submit
 
+### Rich Feature Cards
 
-### Feature Cards
+Each card is just a markdown file with YAML frontmatter.
 
-![Editor View](https://raw.githubusercontent.com/LachyFS/kanban-markdown-vscode-extension/main/docs/images/editor-view.png)
+<div align="center">
+<img src="https://raw.githubusercontent.com/LachyFS/kanban-markdown-vscode-extension/main/docs/images/board-overview.png" alt="Kanban Board Overview" width="800" />
+</div>
 
+- **Priority levels** — Critical, High, Medium, Low with color-coded badges
+- **Assignees** — assign team members to features
+- **Due dates** — smart formatting (Overdue, Today, Tomorrow, "5d", etc.)
+- **Labels** — multiple labels per card, shows up to 3 with "+X more"
+- **Timestamps** — created and modified dates tracked automatically
+- **Archive** — archive completed features to keep the board clean
 
-- **Priority levels**: Critical, High, Medium, Low (color-coded badges)
-- **Assignees**: Assign team members to features
-- **Due dates**: Smart formatting (Overdue, Today, Tomorrow, "5d", etc.)
-- **Labels**: Tag features with multiple labels (shows up to 3 with "+X more")
-- **Auto-generated IDs**: Based on title and timestamp (e.g., `implement-dark-mode-2026-01-29`)
-- **Timestamps**: Created and modified dates tracked automatically
+### Search & Filtering
 
-### Filtering & Search
-- **Full-text search**: Search across content, IDs, assignees, and labels
-- **Priority filter**: Show only critical, high, medium, or low items
-- **Assignee filter**: Filter by team member or show unassigned items
-- **Label filter**: Filter by specific labels
-- **Due date filters**: Overdue, due today, due this week, or no due date
-- **Clear filters button**: Reset all filters at once
-
-### File Organization
-- **Status subfolders**: Features are automatically organized into subfolders by status (with migration of existing files)
+- **Full-text search** — searches content, IDs, assignees, and labels
+- **Priority filter** — show only critical, high, medium, or low items
+- **Assignee filter** — by team member, or show unassigned
+- **Label filter** — by label, or show unlabeled items
+- **Due date filters** — overdue, today, this week, or no date
+- **Clear all** — reset every filter at once
 
 ### Editor Integration
-- Rich text editing with Tiptap markdown editor
-- Inline frontmatter editing (dropdowns for status/priority, inputs for assignee/due date/labels)
-- Auto-save functionality
-- Live settings updates without reopening the board
-- Auto-refresh when files change externally
-- Theme integration with VSCode/Cursor (light & dark mode)
 
-### AI Agent Integration
-- **Claude Code**: Default, Plan, Auto-edit, and Full Auto modes
-- **Codex**: Suggest, Auto-edit, and Full Auto modes
-- **OpenCode**: Agent integration support
-- AI receives feature context (title, priority, labels, description) for informed assistance
+- **Rich text editing** with Tiptap markdown editor
+- **Inline frontmatter editing** — dropdowns for status/priority, inputs for assignee/due date/labels
+- **Auto-save** — writes to disk on change
+- **Auto-refresh** — board updates when files change externally
+- **Native markdown mode** — open files in VS Code's built-in editor instead
+- **Theme integration** — follows your VS Code/Cursor theme (light & dark)
 
-## Installation
+## File Format
 
-### VS Code Marketplace
-Install from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=LachyFS.kanban-markdown) or search for "Kanban Markdown" in the Extensions view.
-
-### Open VSX (VSCodium, Cursor, etc.)
-Install from [Open VSX](https://open-vsx.org/extension/LachyFS/kanban-markdown) or search for "Kanban Markdown" in the Extensions view.
-
-### From VSIX (Manual)
-1. Download the `.vsix` file from the releases
-2. In VSCode: Extensions > `...` > Install from VSIX
-3. Select the downloaded file
-
-## Usage
-
-1. Open the command palette (`Cmd+Shift+P` / `Ctrl+Shift+P`)
-2. Run **"Open Kanban Board"**
-3. Start creating and managing features
-
-Features are stored as markdown files in `.devtool/features/` within your workspace:
+It's just markdown. Features live in `.devtool/features/` by default, organized into subfolders by status.
 
 ```markdown
 ---
@@ -111,24 +128,28 @@ Add a toggle in settings to switch between light and dark themes...
 
 ## Configuration
 
-Available settings in VSCode/Cursor preferences:
+Settings live under `kanban-markdown.*` in your VS Code/Cursor preferences.
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `kanban-markdown.featuresDirectory` | `.devtool/features` | Directory for feature files |
-| `kanban-markdown.defaultPriority` | `medium` | Default priority for new features |
-| `kanban-markdown.defaultStatus` | `backlog` | Default status for new features |
-| `kanban-markdown.columns` | *see below* | Customize column IDs, names, and colors |
-| `kanban-markdown.aiAgent` | `claude` | AI agent (`claude`, `codex`, or `opencode`) |
-| `kanban-markdown.showPriorityBadges` | `true` | Show priority badges on cards |
-| `kanban-markdown.showAssignee` | `true` | Show assignee on cards |
-| `kanban-markdown.showDueDate` | `true` | Show due date on cards |
-| `kanban-markdown.showLabels` | `true` | Show labels on cards and in editors |
-| `kanban-markdown.showBuildWithAI` | `true` | Show "Build with AI" button on cards |
-| `kanban-markdown.compactMode` | `false` | Enable compact card display |
-| `kanban-markdown.addNewCardsToTop` | `false` | Add new cards to the top of the column instead of the bottom |
+| `featuresDirectory` | `.devtool/features` | Directory for feature files (relative to workspace root) |
+| `filenamePattern` | `name-date` | Filename pattern for new cards (`name-date`, `date-name`, `name-datetime`, `datetime-name`) |
+| `defaultPriority` | `medium` | Default priority for new features |
+| `defaultStatus` | `backlog` | Default status for new features |
+| `columns` | *see below* | Customize column IDs, names, and colors |
+| `aiAgent` | `claude` | AI agent for "Build with AI" (`claude`, `codex`, `copilot`, `opencode`) |
+| `showPriorityBadges` | `true` | Show priority badges on cards |
+| `showAssignee` | `true` | Show assignee on cards |
+| `showDueDate` | `true` | Show due date on cards |
+| `showLabels` | `true` | Show labels on cards and in editors |
+| `showBuildWithAI` | `true` | Show "Build with AI" button on cards |
+| `showFileName` | `false` | Show the source markdown filename on cards |
+| `compactMode` | `false` | Use compact card layout |
+| `addNewCardsToTop` | `false` | Add new cards to the top of the column |
+| `markdownEditorMode` | `false` | Open files in VS Code's native text editor instead of the inline rich-text editor |
 
-Default columns configuration:
+Default columns:
+
 ```json
 [
   { "id": "backlog", "name": "Backlog", "color": "#6b7280" },
@@ -139,42 +160,58 @@ Default columns configuration:
 ]
 ```
 
+## Installation
+
+### VS Code Marketplace
+
+Install from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=LachyFS.kanban-markdown) or search "Kanban Markdown" in the Extensions view.
+
+### Open VSX (VSCodium, Cursor, etc.)
+
+Install from [Open VSX](https://open-vsx.org/extension/LachyFS/kanban-markdown) or search "Kanban Markdown" in the Extensions view.
+
+### From VSIX (Manual)
+
+1. Download the `.vsix` from [Releases](https://github.com/LachyFS/kanban-markdown-vscode-extension/releases)
+2. In VS Code: Extensions > `...` > Install from VSIX
+3. Select the downloaded file
+
 ## Development
 
 ### Prerequisites
+
 - Node.js 18+
 - pnpm
 
 ### Setup
 
 ```bash
-# Install dependencies
-pnpm install
-
-# Start development (watch mode)
-pnpm dev
-
-# Build for production
-pnpm build
-
-# Type checking
-pnpm typecheck
-
-# Linting
-pnpm lint
+pnpm install       # Install dependencies
+pnpm dev           # Start development (watch mode)
+pnpm build         # Build for production
+pnpm typecheck     # Type checking
+pnpm lint          # Linting
 ```
 
 ### Debugging
 
-1. Press `F5` in VSCode to launch the Extension Development Host
+1. Press `F5` in VS Code to launch the Extension Development Host
 2. Open the command palette and run "Open Kanban Board"
 3. Make changes and reload the window (`Cmd+R`) to see updates
 
 ### Tech Stack
 
-**Extension**: TypeScript, VSCode API, esbuild
-**Webview**: React 18, Vite, Tailwind CSS, Zustand, Tiptap
+**Extension**: TypeScript, VS Code API, esbuild | **Webview**: React 18, Vite, Tailwind CSS, Zustand, Tiptap
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+
+## Contributors
+
+- [@luciopaiva](https://github.com/luciopaiva) — sidebar view and layout improvements
+- [@ungive](https://github.com/ungive) — file organization and status subfolders
+- [@hodanli](https://github.com/hodanli) — label management enhancements
+- [@SuperbDotHub](https://github.com/SuperbDotHub) — compact mode and card display options
 
 ## License
 
-MIT
+[MIT](LICENSE)
