@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env tsx
 
 /**
  * Release script for version bumping and git tagging
@@ -10,32 +10,36 @@
  *   pnpm release 1.2.3   # Set specific version
  */
 
-const { execSync } = require('child_process');
-const fs = require('fs');
-const path = require('path');
+import { execSync } from 'child_process';
+import fs from 'fs';
+import path from 'path';
+import readline from 'readline';
+import { fileURLToPath } from 'url';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const packagePath = path.join(__dirname, '..', 'package.json');
 
-function run(cmd, options = {}) {
+function run(cmd: string, options: Record<string, unknown> = {}) {
   console.log(`> ${cmd}`);
   return execSync(cmd, { stdio: 'inherit', ...options });
 }
 
-function runCapture(cmd) {
+function runCapture(cmd: string): string {
   return execSync(cmd, { encoding: 'utf-8' }).trim();
 }
 
-function getPackageJson() {
+function getPackageJson(): { name: string; version: string; [key: string]: unknown } {
   return JSON.parse(fs.readFileSync(packagePath, 'utf-8'));
 }
 
-function setPackageVersion(version) {
+function setPackageVersion(version: string) {
   const pkg = getPackageJson();
   pkg.version = version;
   fs.writeFileSync(packagePath, JSON.stringify(pkg, null, 2) + '\n');
 }
 
-function bumpVersion(current, type) {
+function bumpVersion(current: string, type: string): string {
   const [major, minor, patch] = current.split('.').map(Number);
 
   switch (type) {
@@ -54,7 +58,33 @@ function bumpVersion(current, type) {
   }
 }
 
-function main() {
+function doRelease(type: string) {
+  const pkg = getPackageJson();
+  const currentVersion = pkg.version;
+  const newVersion = bumpVersion(currentVersion, type);
+
+  console.log(`\nReleasing ${pkg.name}`);
+  console.log(`  Current version: ${currentVersion}`);
+  console.log(`  New version:     ${newVersion}\n`);
+
+  // Update package.json
+  setPackageVersion(newVersion);
+  console.log(`Updated package.json to ${newVersion}`);
+
+  // Commit the version bump
+  run(`git add package.json`);
+  run(`git commit -m "chore: release v${newVersion}"`);
+
+  // Create git tag
+  run(`git tag -a v${newVersion} -m "Release v${newVersion}"`);
+
+  console.log(`\n✓ Created tag v${newVersion}`);
+  console.log(`\nTo publish, push the tag:`);
+  console.log(`  git push origin main --tags`);
+  console.log(`\nThis will trigger the release workflow on GitHub.`);
+}
+
+async function main() {
   const type = process.argv[2] || 'patch';
 
   // Check for uncommitted changes
@@ -74,48 +104,20 @@ function main() {
   if (branch !== 'main') {
     console.error(`Warning: You are on branch '${branch}', not 'main'.`);
     console.error('Consider switching to main before releasing.');
-    const readline = require('readline');
     const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 
-    return new Promise((resolve) => {
-      rl.question('Continue anyway? (y/N) ', (answer) => {
-        rl.close();
-        if (answer.toLowerCase() !== 'y') {
-          console.log('Aborted.');
-          process.exit(0);
-        }
-        resolve();
-      });
-    }).then(doRelease);
+    const answer = await new Promise<string>((resolve) => {
+      rl.question('Continue anyway? (y/N) ', resolve);
+    });
+    rl.close();
+
+    if (answer.toLowerCase() !== 'y') {
+      console.log('Aborted.');
+      process.exit(0);
+    }
   }
 
-  return doRelease();
-
-  function doRelease() {
-    const pkg = getPackageJson();
-    const currentVersion = pkg.version;
-    const newVersion = bumpVersion(currentVersion, type);
-
-    console.log(`\nReleasing ${pkg.name}`);
-    console.log(`  Current version: ${currentVersion}`);
-    console.log(`  New version:     ${newVersion}\n`);
-
-    // Update package.json
-    setPackageVersion(newVersion);
-    console.log(`Updated package.json to ${newVersion}`);
-
-    // Commit the version bump
-    run(`git add package.json`);
-    run(`git commit -m "chore: release v${newVersion}"`);
-
-    // Create git tag
-    run(`git tag -a v${newVersion} -m "Release v${newVersion}"`);
-
-    console.log(`\n✓ Created tag v${newVersion}`);
-    console.log(`\nTo publish, push the tag:`);
-    console.log(`  git push origin main --tags`);
-    console.log(`\nThis will trigger the release workflow on GitHub.`);
-  }
+  doRelease(type);
 }
 
 main();
